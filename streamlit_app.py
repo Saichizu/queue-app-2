@@ -72,7 +72,7 @@ with cols[1]:
 with cols[2]:
     st.write(" ")  # spacer
 
-# ---- Quick Actions (compact like reorder) ----
+# ---- Quick Actions (2-column compact lists) ----
 st.markdown("#### Quick Actions")
 qa = st.columns(3)
 
@@ -80,6 +80,16 @@ qa = st.columns(3)
 for flag in ["show_leave", "show_hold", "show_return"]:
     if flag not in st.session_state:
         st.session_state[flag] = False
+
+# Small font CSS
+st.markdown("""
+    <style>
+    .small-btn button {
+        font-size: 12px !important;
+        padding: 2px 6px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 with qa[0]:
     if st.button("➖ Leave", use_container_width=True):
@@ -91,11 +101,16 @@ with qa[0]:
         if not st.session_state.queue:
             st.caption("— No one in queue —")
         else:
-            st.markdown("##### Click a name to Leave:")
+            cols = st.columns(2)
             for i, person in enumerate(st.session_state.queue):
-                if st.button(f"❌ {person}", key=f"leave_btn_{i}"):
-                    st.session_state.queue.remove(person)
-                    bump_and_rerun()
+                col = cols[i % 2]
+                with col, st.container():
+                    with st.container():
+                        st.markdown('<div class="small-btn">', unsafe_allow_html=True)
+                        if st.button(f"❌ {person}", key=f"leave_btn_{i}", use_container_width=True):
+                            st.session_state.queue.remove(person)
+                            bump_and_rerun()
+                        st.markdown('</div>', unsafe_allow_html=True)
 
 with qa[1]:
     if st.button("⏳ Hold", use_container_width=True):
@@ -107,12 +122,16 @@ with qa[1]:
         if not st.session_state.queue:
             st.caption("— No one in queue —")
         else:
-            st.markdown("##### Click a name to Hold:")
+            cols = st.columns(2)
             for i, person in enumerate(st.session_state.queue):
-                if st.button(f"⏳ {person}", key=f"hold_btn_{i}"):
-                    st.session_state.queue.remove(person)
-                    st.session_state.calypso.append(person)
-                    bump_and_rerun()
+                col = cols[i % 2]
+                with col, st.container():
+                    st.markdown('<div class="small-btn">', unsafe_allow_html=True)
+                    if st.button(f"⏳ {person}", key=f"hold_btn_{i}", use_container_width=True):
+                        st.session_state.queue.remove(person)
+                        st.session_state.calypso.append(person)
+                        bump_and_rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
 
 with qa[2]:
     if st.button("🏝️ Return", use_container_width=True):
@@ -124,12 +143,17 @@ with qa[2]:
         if not st.session_state.calypso:
             st.caption("— No one away —")
         else:
-            st.markdown("##### Click a name to Return:")
+            cols = st.columns(2)
             for i, person in enumerate(st.session_state.calypso):
-                if st.button(f"↩️ {person}", key=f"return_btn_{i}"):
-                    st.session_state.calypso.remove(person)
-                    st.session_state.queue.append(person)
-                    bump_and_rerun()
+                col = cols[i % 2]
+                with col, st.container():
+                    st.markdown('<div class="small-btn">', unsafe_allow_html=True)
+                    if st.button(f"↩️ {person}", key=f"return_btn_{i}", use_container_width=True):
+                        st.session_state.calypso.remove(person)
+                        st.session_state.queue.append(person)
+                        bump_and_rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 
@@ -198,6 +222,7 @@ save_state()
 if st.session_state.get("needs_rerun"):
     st.session_state.needs_rerun = False
     st.rerun()
+
 
 
 
