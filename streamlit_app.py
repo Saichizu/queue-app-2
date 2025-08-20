@@ -72,7 +72,7 @@ with cols[1]:
 with cols[2]:
     st.write(" ")  # spacer
 
-# ---- Quick Actions (2-column compact lists) ----
+# ---- Quick Actions (tight 2-column layout) ----
 st.markdown("#### Quick Actions")
 qa = st.columns(3)
 
@@ -81,15 +81,33 @@ for flag in ["show_leave", "show_hold", "show_return"]:
     if flag not in st.session_state:
         st.session_state[flag] = False
 
-# Small font CSS
+# CSS to shrink spacing
 st.markdown("""
     <style>
     .small-btn button {
         font-size: 12px !important;
         padding: 2px 6px !important;
+        margin: 0px !important;
+    }
+    div[data-testid="stHorizontalBlock"] {
+        gap: 4px !important;  /* reduce space between columns */
+    }
+    div[data-testid="stVerticalBlock"] {
+        gap: 2px !important;  /* reduce vertical space */
     }
     </style>
 """, unsafe_allow_html=True)
+
+def render_names(names, action):
+    cols = st.columns(2, gap="small")
+    for i, person in enumerate(names):
+        col = cols[i % 2]
+        with col:
+            st.markdown('<div class="small-btn">', unsafe_allow_html=True)
+            if st.button(f"{action} {person}", key=f"{action}_{i}", use_container_width=True):
+                return person
+            st.markdown('</div>', unsafe_allow_html=True)
+    return None
 
 with qa[0]:
     if st.button("➖ Leave", use_container_width=True):
@@ -101,16 +119,10 @@ with qa[0]:
         if not st.session_state.queue:
             st.caption("— No one in queue —")
         else:
-            cols = st.columns(2)
-            for i, person in enumerate(st.session_state.queue):
-                col = cols[i % 2]
-                with col, st.container():
-                    with st.container():
-                        st.markdown('<div class="small-btn">', unsafe_allow_html=True)
-                        if st.button(f"❌ {person}", key=f"leave_btn_{i}", use_container_width=True):
-                            st.session_state.queue.remove(person)
-                            bump_and_rerun()
-                        st.markdown('</div>', unsafe_allow_html=True)
+            person = render_names(st.session_state.queue, "❌")
+            if person:
+                st.session_state.queue.remove(person)
+                bump_and_rerun()
 
 with qa[1]:
     if st.button("⏳ Hold", use_container_width=True):
@@ -122,16 +134,11 @@ with qa[1]:
         if not st.session_state.queue:
             st.caption("— No one in queue —")
         else:
-            cols = st.columns(2)
-            for i, person in enumerate(st.session_state.queue):
-                col = cols[i % 2]
-                with col, st.container():
-                    st.markdown('<div class="small-btn">', unsafe_allow_html=True)
-                    if st.button(f"⏳ {person}", key=f"hold_btn_{i}", use_container_width=True):
-                        st.session_state.queue.remove(person)
-                        st.session_state.calypso.append(person)
-                        bump_and_rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
+            person = render_names(st.session_state.queue, "⏳")
+            if person:
+                st.session_state.queue.remove(person)
+                st.session_state.calypso.append(person)
+                bump_and_rerun()
 
 with qa[2]:
     if st.button("🏝️ Return", use_container_width=True):
@@ -143,21 +150,11 @@ with qa[2]:
         if not st.session_state.calypso:
             st.caption("— No one away —")
         else:
-            cols = st.columns(2)
-            for i, person in enumerate(st.session_state.calypso):
-                col = cols[i % 2]
-                with col, st.container():
-                    st.markdown('<div class="small-btn">', unsafe_allow_html=True)
-                    if st.button(f"↩️ {person}", key=f"return_btn_{i}", use_container_width=True):
-                        st.session_state.calypso.remove(person)
-                        st.session_state.queue.append(person)
-                        bump_and_rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
+            person = render_names(st.session_state.calypso, "↩️")
+            if person:
+                st.session_state.calypso.remove(person)
+                st.session_state.queue.append(person)
+                bump_and_rerun()
 
 # ---- Layout: Reorder (left) + Output (right) ----
 if st.session_state.queue:
@@ -222,6 +219,7 @@ save_state()
 if st.session_state.get("needs_rerun"):
     st.session_state.needs_rerun = False
     st.rerun()
+
 
 
 
