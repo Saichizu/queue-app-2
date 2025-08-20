@@ -72,7 +72,7 @@ with cols[1]:
 with cols[2]:
     st.write(" ")  # spacer
 
-# ---- Quick Actions (collapsed with pill-style names) ----
+# ---- Quick Actions (compact like reorder) ----
 st.markdown("#### Quick Actions")
 qa = st.columns(3)
 
@@ -80,26 +80,6 @@ qa = st.columns(3)
 for flag in ["show_leave", "show_hold", "show_return"]:
     if flag not in st.session_state:
         st.session_state[flag] = False
-
-# CSS for pill buttons
-st.markdown("""
-    <style>
-    .pill-button {
-        display: inline-block;
-        margin: 2px 4px;
-        padding: 4px 10px;
-        border-radius: 16px;
-        background-color: #f0f2f6;
-        border: 1px solid #ccc;
-        cursor: pointer;
-        font-size: 13px;
-        transition: all 0.2s;
-    }
-    .pill-button:hover {
-        background-color: #e0e0e0;
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 with qa[0]:
     if st.button("➖ Leave", use_container_width=True):
@@ -111,16 +91,11 @@ with qa[0]:
         if not st.session_state.queue:
             st.caption("— No one in queue —")
         else:
+            st.markdown("##### Click a name to Leave:")
             for i, person in enumerate(st.session_state.queue):
-                form_key = f"leave_form_{i}"
-                with st.form(form_key):
-                    submitted = st.form_submit_button(
-                        f"{person}",
-                        use_container_width=True
-                    )
-                    if submitted:
-                        st.session_state.queue.remove(person)
-                        bump_and_rerun()
+                if st.button(f"❌ {person}", key=f"leave_btn_{i}"):
+                    st.session_state.queue.remove(person)
+                    bump_and_rerun()
 
 with qa[1]:
     if st.button("⏳ Hold", use_container_width=True):
@@ -132,17 +107,12 @@ with qa[1]:
         if not st.session_state.queue:
             st.caption("— No one in queue —")
         else:
+            st.markdown("##### Click a name to Hold:")
             for i, person in enumerate(st.session_state.queue):
-                form_key = f"hold_form_{i}"
-                with st.form(form_key):
-                    submitted = st.form_submit_button(
-                        f"{person}",
-                        use_container_width=True
-                    )
-                    if submitted:
-                        st.session_state.queue.remove(person)
-                        st.session_state.calypso.append(person)
-                        bump_and_rerun()
+                if st.button(f"⏳ {person}", key=f"hold_btn_{i}"):
+                    st.session_state.queue.remove(person)
+                    st.session_state.calypso.append(person)
+                    bump_and_rerun()
 
 with qa[2]:
     if st.button("🏝️ Return", use_container_width=True):
@@ -154,17 +124,13 @@ with qa[2]:
         if not st.session_state.calypso:
             st.caption("— No one away —")
         else:
+            st.markdown("##### Click a name to Return:")
             for i, person in enumerate(st.session_state.calypso):
-                form_key = f"return_form_{i}"
-                with st.form(form_key):
-                    submitted = st.form_submit_button(
-                        f"{person}",
-                        use_container_width=True
-                    )
-                    if submitted:
-                        st.session_state.calypso.remove(person)
-                        st.session_state.queue.append(person)
-                        bump_and_rerun()
+                if st.button(f"↩️ {person}", key=f"return_btn_{i}"):
+                    st.session_state.calypso.remove(person)
+                    st.session_state.queue.append(person)
+                    bump_and_rerun()
+
 
 
 
@@ -232,6 +198,7 @@ save_state()
 if st.session_state.get("needs_rerun"):
     st.session_state.needs_rerun = False
     st.rerun()
+
 
 
 
