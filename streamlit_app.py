@@ -35,7 +35,7 @@ def bump_and_rerun():
     st.rerun()
 
 # ---------------- UI ----------------
-st.title("⚔️EPIC Song Queue🎭")
+st.title("⚔️EPIC Song Queue 2🎭")
 
 # Input box (Enter = Join)
 def join_on_enter():
@@ -232,6 +232,7 @@ save_state()
 if st.session_state.get("needs_rerun"):
     st.session_state.needs_rerun = False
     st.rerun()
+
 
 
 
