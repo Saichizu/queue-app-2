@@ -267,6 +267,7 @@ if st.session_state.queue:
         def fmt_name(name):
             return f"{name} 📣" if name in st.session_state.pinged else name
         output = "🏛️ 𝑬𝑷𝑰𝑪 𝑺𝒐𝒏𝒈 𝑸𝒖𝒆𝒖𝒆 2 🎭\n"
+        output += "<https://epic-queue-2.streamlit.app/>"
         output += f"Managed by: {st.session_state.current_manager if st.session_state.current_manager else '-'}\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\n"
         output += f"🎶 𝑪𝑼𝑹𝑹𝑬𝑵𝑻𝑳𝒀 𝑺𝑰𝑵𝑮𝑰𝑵𝑮\n✨👑🎤 {fmt_name(st.session_state.queue[0]) if len(st.session_state.queue)>=1 else '-'}\n"
@@ -312,6 +313,7 @@ st.markdown("""
 
 # --- Credit at bottom ---
 st.markdown('<div style="text-align:center; font-size:11px; color:gray; margin-top:18px;">credit: Saichizu</div>', unsafe_allow_html=True)
+
 
 
 
