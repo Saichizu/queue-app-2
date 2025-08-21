@@ -64,7 +64,7 @@ else:
     st.info("💡 No one is currently managing the queue. Press 'Manage Queue' to take control.")
 
 # ----------- Manager Name Input & Claim Button -----------
-claim_cols = st.columns([4, 1])
+claim_cols = st.columns([4, 1, 1])
 with claim_cols[0]:
     manager_name = st.text_input(
         "Type your name",
@@ -98,6 +98,15 @@ with claim_cols[1]:
             handle_claim_request(manager_name)
         else:
             st.warning("Type your name before claiming the queue.")
+
+with claim_cols[2]:
+    if st.session_state.current_user == st.session_state.current_manager and st.session_state.current_manager:
+        if st.button("🔓 Release Manage Rights", use_container_width=True):
+            st.session_state.current_manager = ""
+            st.session_state.current_user = ""
+            save_state()
+            st.success("You have released manage rights.")
+            st.rerun()
 
 # Prompt for manager replacement
 if st.session_state.show_manager_confirm:
@@ -301,6 +310,7 @@ st.markdown("""
 
 # --- Credit at bottom ---
 st.markdown('<div style="text-align:center; font-size:11px; color:gray; margin-top:18px;">credit: Saichizu</div>', unsafe_allow_html=True)
+
 
 
 
