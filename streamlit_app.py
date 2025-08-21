@@ -93,7 +93,7 @@ def handle_claim_request(name):
             really_claim_manager(name)
 
 with claim_cols[1]:
-    if st.button("🛠 Claim Queue", use_container_width=True):
+    if st.button("🛠 Manage Queue", use_container_width=True):
         if manager_name:
             handle_claim_request(manager_name)
         else:
@@ -258,6 +258,7 @@ if st.session_state.queue:
         def fmt_name(name):
             return f"{name} 📣" if name in st.session_state.pinged else name
         output = "🏛️ 𝑬𝑷𝑰𝑪 𝑺𝒐𝒏𝒈 𝑸𝒖𝒆𝒖𝒆 2 🎭\n"
+        output += f"Managed by: {st.session_state.current_manager if st.session_state.current_manager else '-'}\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\n"
         output += f"🎶 𝑪𝑼𝑹𝑹𝑬𝑵𝑻𝑳𝒀 𝑺𝑰𝑵𝑮𝑰𝑵𝑮\n✨👑🎤 {fmt_name(st.session_state.queue[0]) if len(st.session_state.queue)>=1 else '-'}\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\n"
@@ -300,6 +301,7 @@ st.markdown("""
 
 # --- Credit at bottom ---
 st.markdown('<div style="text-align:center; font-size:11px; color:gray; margin-top:18px;">credit: Saichizu</div>', unsafe_allow_html=True)
+
 
 
 
