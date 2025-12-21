@@ -54,7 +54,7 @@ def bump_and_rerun():
     st.session_state.needs_rerun = True
     st.rerun()
 
-st.title("⚔️EPIC Singing VC 1 Queue🎭")
+st.title("⚔️EPIC Singing VC 2 Queue🎭")
 st.markdown(
     "_Use this only for **Epic Singing VC 2** because changes are saved. "
     "For Epic Singing VC 1, use [this link](https://epic-queue.streamlit.app/)._"
@@ -268,7 +268,7 @@ if st.session_state.queue:
     with right:
         def fmt_name(name):
             return f"{name} 📣" if name in st.session_state.pinged else name
-        output = "🏛️ 𝑬𝑷𝑰𝑪 𝑺𝒐𝒏𝒈 𝑸𝒖𝒆𝒖𝒆 1 🎭\n"
+        output = "🏛️ 𝑬𝑷𝑰𝑪 𝑺𝒐𝒏𝒈 𝑸𝒖𝒆𝒖𝒆 2 🎭\n"
         output += "<https://epic-queue.streamlit.app/>\n"
         output += f"Managed by: {st.session_state.current_manager if st.session_state.current_manager else '-'}\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\n"
@@ -392,6 +392,7 @@ st.markdown("""
     div[data-testid="stVerticalBlock"] { gap: 4px !important; }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 
