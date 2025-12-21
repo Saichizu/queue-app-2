@@ -1,6 +1,8 @@
 import streamlit as st
 import streamlit_sortables as sortables
-import json, os
+import json, os, io, base64
+from PIL import Image, ImageDraw, ImageFont
+from streamlit_autorefresh import st_autorefresh
 
 SAVE_FILE = "queue.json"
 
@@ -52,7 +54,7 @@ def bump_and_rerun():
     st.session_state.needs_rerun = True
     st.rerun()
 
-st.title("⚔️EPIC Singing VC 2 Queue🎭")
+st.title("⚔️EPIC Singing VC 1 Queue🎭")
 st.markdown(
     "_Use this only for **Epic Singing VC 2** because changes are saved. "
     "For Epic Singing VC 1, use [this link](https://epic-queue.streamlit.app/)._"
@@ -266,8 +268,8 @@ if st.session_state.queue:
     with right:
         def fmt_name(name):
             return f"{name} 📣" if name in st.session_state.pinged else name
-        output = "🏛️ 𝑬𝑷𝑰𝑪 𝑺𝒐𝒏𝒈 𝑸𝒖𝒆𝒖𝒆 2 🎭\n"
-        output += "<https://epic-queue-2.streamlit.app/>\n"
+        output = "🏛️ 𝑬𝑷𝑰𝑪 𝑺𝒐𝒏𝒈 𝑸𝒖𝒆𝒖𝒆 1 🎭\n"
+        output += "<https://epic-queue.streamlit.app/>\n"
         output += f"Managed by: {st.session_state.current_manager if st.session_state.current_manager else '-'}\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\n"
         output += f"🎶 𝑪𝑼𝑹𝑹𝑬𝑵𝑻𝑳𝒀 𝑺𝑰𝑵𝑮𝑰𝑵𝑮\n✨👑🎤 {fmt_name(st.session_state.queue[0]) if len(st.session_state.queue)>=1 else '-'}\n"
@@ -287,14 +289,94 @@ if st.session_state.queue:
             output += "- None\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\nReact to join the legend:\n🎤 — Join the Queue\n🚪 — Leave the Queue\n📣 — Summon the Bard (Ping)\n⏳ — Place Me On Hold\n"
         output += "━━━━━━━━━━━━━━━━━━━━━\n"
-        output += "The Wheel of The Gods: <https://wheelofnames.com/mer-8nr>\n"
+        output += "<https://wheelofnames.com/jr7-eaa>\n"
         st.code(output, language="text")
 
+
+# ----------- ✨ Compact Queue Card (Beautiful Screenshot Card) -----------
+if st.session_state.queue:
+    st.markdown(
+        """
+        <style>
+        .queue-card {
+            max-width: 520px;
+            margin: 30px auto 50px;
+            background: linear-gradient(135deg, #1e1330 0%, #301b3f 60%, #3a1b3a 100%);
+            color: #ffffff;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 8px 25px rgba(40,20,80,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .qc-head { display:flex; justify-content:space-between; align-items:flex-start; }
+        .qc-title { font-size:20px; font-weight:700; letter-spacing:0.6px; }
+        .qc-managed { font-size:12px; opacity:0.8; }
+        .who { font-size:16px; font-weight:700; }
+        .qc-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+        .qc-box { background:rgba(255,255,255,0.05); border-radius:10px; padding:10px; }
+        .label { font-size:11px; color:#d7cfff; font-weight:700; margin-bottom:6px; display:block; }
+        .badge { background:rgba(255,255,255,0.1); padding:5px 8px; border-radius:8px; font-size:13px; display:inline-block; margin:3px; }
+        .foot { font-size:11px; color:rgba(255,255,255,0.7); margin-top:10px; text-align:center; }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    def fmt_card_name(name):
+        return f"📣 {name}" if name in st.session_state.pinged else name
+
+    now_name = fmt_card_name(st.session_state.queue[0]) if len(st.session_state.queue) >= 1 else "-"
+    next_name = fmt_card_name(st.session_state.queue[1]) if len(st.session_state.queue) >= 2 else "-"
+
+    queue_items_html = "".join(
+        f'<div class="badge">🎭 {fmt_card_name(n)}</div>' for n in st.session_state.queue[2:]
+    ) if len(st.session_state.queue) > 2 else '<div class="badge">—</div>'
+
+    calypso_items_html = "".join(
+        f'<div class="badge">🌴 {fmt_card_name(n)}</div>' for n in st.session_state.calypso
+    ) if st.session_state.calypso else '<div class="badge">—</div>'
+
+    card_html = f"""
+    <div class="queue-card">
+        <div class="qc-head">
+            <div>
+                <div class="qc-title">🎵 EPIC Song Queue</div>
+                <div class="qc-managed">Managed by {st.session_state.current_manager or '-'}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:12px;color:#f5e6ff;">Now</div>
+                <div class="who">{now_name}</div>
+                <div style="font-size:12px;color:#f5e6ff;margin-top:6px;">Next</div>
+                <div class="who">{next_name}</div>
+            </div>
+        </div>
+        <div class="qc-grid">
+            <div class="qc-box">
+                <span class="label">🛶 On Queue</span>
+                {queue_items_html}
+            </div>
+            <div class="qc-box">
+                <span class="label">🏝️ Away with Calypso</span>
+                {calypso_items_html}
+            </div>
+        </div>
+        <div class="foot">Share this card by screenshot — the text queue above remains for copy/paste.</div>
+    </div>
+    """
+
+    # ✅ This is the key line that fixes your issue
+    st.markdown(card_html, unsafe_allow_html=True)
+
+
+
+
+# Save & auto-rerun management
 save_state()
 if st.session_state.get("needs_rerun"):
     st.session_state.needs_rerun = False
     st.rerun()
 
+# --- Custom Styling for small UI elements ---
 st.markdown("""
     <style>
     .name-btn button {
@@ -310,14 +392,6 @@ st.markdown("""
     div[data-testid="stVerticalBlock"] { gap: 4px !important; }
     </style>
 """, unsafe_allow_html=True)
-
-# --- Credit at bottom ---
-st.markdown('<div style="text-align:center; font-size:11px; color:gray; margin-top:18px;">credit: Saichizu</div>', unsafe_allow_html=True)
-
-
-
-
-
 
 
 
